@@ -31,6 +31,7 @@ type Config struct {
 	DBPath         string      `json:"db_path"`
 	MigrationsPath string      `json:"migrations_prefix"`
 	TestFlag       bool        `json:"test_flag"`
+	ContactAddress string      `json:"contact_address"`
 }
 
 // Conf contains the initialized configuration struct
@@ -38,6 +39,9 @@ var Conf Config
 
 // Version contains the current gophish version
 var Version = ""
+
+// ServerName is the server type that is returned in the transparency response.
+const ServerName = "gophish"
 
 // LoadConfig loads the configuration from the specified filepath
 func LoadConfig(filepath string) {
@@ -52,4 +56,11 @@ func LoadConfig(filepath string) {
 	Conf.MigrationsPath = Conf.MigrationsPath + Conf.DBName
 	// Explicitly set the TestFlag to false to prevent config.json overrides
 	Conf.TestFlag = false
+
+	// Print a warning if a contact address isn't provided
+	// (see: https://github.com/gophish/gophish/issues/1057)
+	if Conf.ContactAddress == "" {
+		log.Warnf("No contact address has been configured.")
+		log.Warnf("Please consider adding a contact_address entry in your config.json")
+	}
 }

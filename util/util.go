@@ -15,11 +15,19 @@ import (
 	"net/http"
 	"net/mail"
 	"os"
+	"regexp"
 	"time"
 
 	log "github.com/gophish/gophish/logger"
 	"github.com/gophish/gophish/models"
 	"github.com/jordan-wright/email"
+)
+
+var (
+	firstNameRegex = regexp.MustCompile(`(?i)first[\s_-]*name`)
+	lastNameRegex  = regexp.MustCompile(`(?i)last[\s_-]*name`)
+	emailRegex     = regexp.MustCompile(`(?i)email`)
+	positionRegex  = regexp.MustCompile(`(?i)position`)
 )
 
 // ParseMail takes in an HTTP Request and returns an Email object
@@ -68,13 +76,13 @@ func ParseCSV(r *http.Request) ([]models.Target, error) {
 		ps := ""
 		for i, v := range record {
 			switch {
-			case v == "First Name":
+			case firstNameRegex.MatchString(v):
 				fi = i
-			case v == "Last Name":
+			case lastNameRegex.MatchString(v):
 				li = i
-			case v == "Email":
+			case emailRegex.MatchString(v):
 				ei = i
-			case v == "Position":
+			case positionRegex.MatchString(v):
 				pi = i
 			}
 		}
@@ -83,27 +91,29 @@ func ParseCSV(r *http.Request) ([]models.Target, error) {
 			if err == io.EOF {
 				break
 			}
-			if fi != -1 {
+			if fi != -1 && len(record) > fi {
 				fn = record[fi]
 			}
-			if li != -1 {
+			if li != -1 && len(record) > li {
 				ln = record[li]
 			}
-			if ei != -1 {
+			if ei != -1 && len(record) > ei {
 				csvEmail, err := mail.ParseAddress(record[ei])
 				if err != nil {
 					continue
 				}
 				ea = csvEmail.Address
 			}
-			if pi != -1 {
+			if pi != -1 && len(record) > pi {
 				ps = record[pi]
 			}
 			t := models.Target{
-				FirstName: fn,
-				LastName:  ln,
-				Email:     ea,
-				Position:  ps,
+				BaseRecipient: models.BaseRecipient{
+					FirstName: fn,
+					LastName:  ln,
+					Email:     ea,
+					Position:  ps,
+				},
 			}
 			ts = append(ts, t)
 		}
