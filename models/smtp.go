@@ -41,6 +41,7 @@ type SMTP struct {
 	IgnoreCertErrors bool      `json:"ignore_cert_errors"`
 	Headers          []Header  `json:"headers"`
 	ModifiedDate     time.Time `json:"modified_date"`
+	BlockSize        int       `json:"block_size,omitempty"`
 }
 
 // Header contains the fields and methods for a sending profile to have
@@ -56,7 +57,7 @@ type Header struct {
 // specified in the SMTP configuration
 var ErrFromAddressNotSpecified = errors.New("No From Address specified")
 
-// ErrHostNotSpecified is thrown when there is no Host specified
+// ErrHostNotSpecified is thrown when there is no rost specified
 // in the SMTP configuration
 var ErrHostNotSpecified = errors.New("No SMTP Host specified")
 
