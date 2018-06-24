@@ -58,6 +58,7 @@ function save(idx) {
     profile.host = $("#host").val()
     profile.username = $("#username").val()
     profile.password = $("#password").val()
+    profile.block_size = $("#block_size").val()
     profile.ignore_cert_errors = $("#ignore_cert_errors").prop("checked")
     if (idx != -1) {
         profile.id = profiles[idx].id
@@ -92,6 +93,7 @@ function dismiss() {
     $("#host").val("")
     $("#username").val("")
     $("#password").val("")
+    $("#block_size").val("")
     $("#ignore_cert_errors").prop("checked", true)
     $("#headersTable").dataTable().DataTable().clear().draw()
     $("#modal").modal('hide')
@@ -133,6 +135,7 @@ function edit(idx) {
         $("#host").val(profile.host)
         $("#username").val(profile.username)
         $("#password").val(profile.password)
+        $("#block_size").val(profile.block_size)
         $("#ignore_cert_errors").prop("checked", profile.ignore_cert_errors)
         $.each(profile.headers, function (i, record) {
             addCustomHeader(record.key, record.value)
@@ -152,6 +155,7 @@ function copy(idx) {
     $("#host").val(profile.host)
     $("#username").val(profile.username)
     $("#password").val(profile.password)
+    $("#block_size").val(profile.block_size)
     $("#ignore_cert_errors").prop("checked", profile.ignore_cert_errors)
 }
 
