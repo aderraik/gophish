@@ -144,12 +144,29 @@ func sendMail(ctx context.Context, dialer Dialer, ms []Mail) {
 	}
 	defer sender.Close()
 	message := gomail.NewMessage()
+	// TODO: Need to blocking the messages to avoid to be marked as a SPAMMER
+	maximumEmailsPerConnection := 20
+	sentEmails := 0
 	for i, m := range ms {
 		select {
 		case <-ctx.Done():
 			return
 		default:
 			break
+		}
+		// Reach maximum number of emails per connection?
+		if sentEmails % maximumEmailsPerConnection == 0 {
+			// Close current connection
+			sender.Close()
+			// Reopen
+			sender, err = dialHost(ctx, dialer)
+			if err != nil {
+				log.Warn(err)
+				errorMail(err, ms)
+				return
+			}
+			// Reset counter
+			sentEmails = 0
 		}
 		message.Reset()
 		err = m.Generate(message)
@@ -216,5 +233,6 @@ func sendMail(ctx context.Context, dialer Dialer, ms []Mail) {
 			"email": message.GetHeader("To")[0],
 		}).Info("Email sent")
 		m.Success()
+		sentEmails++
 	}
 }
