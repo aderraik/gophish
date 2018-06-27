@@ -59,6 +59,15 @@ function save(idx) {
     profile.username = $("#username").val()
     profile.password = $("#password").val()
     profile.block_size = $("#block_size").val()
+    // Check and convert block size to integer
+    if (profile.block_size != null && profile.block_size.length > 0) {
+        var bs = parseInt(profile.block_size, 10)
+        if (isNaN(bs) || bs < 0) {
+            modalError('Invalid Block Size. Should be between: 0 to n.')
+            return
+        }
+        profile.block_size = bs;
+    }
     profile.ignore_cert_errors = $("#ignore_cert_errors").prop("checked")
     if (idx != -1) {
         profile.id = profiles[idx].id
