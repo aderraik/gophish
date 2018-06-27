@@ -66,7 +66,9 @@ function save(idx) {
             modalError('Invalid Block Size. Should be between: 0 to n.')
             return
         }
-        profile.block_size = bs;
+        profile.block_size = bs
+    } else {
+        profile.block_size = 0
     }
     profile.ignore_cert_errors = $("#ignore_cert_errors").prop("checked")
     if (idx != -1) {
