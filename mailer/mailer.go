@@ -151,7 +151,7 @@ func sendMail(ctx context.Context, dialer Dialer, ms []Mail) {
 	if maximumEmailsPerConnection == 0 {
 		maximumEmailsPerConnection = len(ms)
 	}
-	log.Infof("BlockSize: [%d] [%d]", dialer.GetBlockSize(), maximumEmailsPerConnection)
+	log.Debugf("BlockSize: [%d] [%d]", dialer.GetBlockSize(), maximumEmailsPerConnection)
 	sentEmails := 0
 	for i, m := range ms {
 		select {
