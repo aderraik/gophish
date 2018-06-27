@@ -39,6 +39,7 @@ type Sender interface {
 // Dialer dials to an SMTP server and returns the SendCloser
 type Dialer interface {
 	Dial() (Sender, error)
+	GetBlockSize() int
 }
 
 // Mail is an interface that handles the common operations for email messages
@@ -144,8 +145,13 @@ func sendMail(ctx context.Context, dialer Dialer, ms []Mail) {
 	}
 	defer sender.Close()
 	message := gomail.NewMessage()
-	// TODO: Need to blocking the messages to avoid to be marked as a SPAMMER
-	maximumEmailsPerConnection := 20
+	// Get the BlockSize from SMTP configuration
+	maximumEmailsPerConnection := dialer.GetBlockSize()
+	// Check limit
+	if maximumEmailsPerConnection == 0 {
+		maximumEmailsPerConnection = len(ms)
+	}
+	log.Infof("BlockSize: [%d] [%d]", dialer.GetBlockSize(), maximumEmailsPerConnection)
 	sentEmails := 0
 	for i, m := range ms {
 		select {
@@ -155,7 +161,7 @@ func sendMail(ctx context.Context, dialer Dialer, ms []Mail) {
 			break
 		}
 		// Reach maximum number of emails per connection?
-		if sentEmails % maximumEmailsPerConnection == 0 {
+		if sentEmails%maximumEmailsPerConnection == 0 {
 			// Close current connection
 			sender.Close()
 			// Reopen
@@ -190,9 +196,9 @@ func sendMail(ctx context.Context, dialer Dialer, ms []Mail) {
 					m.Backoff(err)
 					sender.Reset()
 					continue
-				// Otherwise, if it's a permanent error, we shouldn't backoff this message,
-				// since the RFC specifies that running the same commands won't work next time.
-				// We should reset our sender and error this message out.
+					// Otherwise, if it's a permanent error, we shouldn't backoff this message,
+					// since the RFC specifies that running the same commands won't work next time.
+					// We should reset our sender and error this message out.
 				case te.Code >= 500 && te.Code <= 599:
 					log.WithFields(logrus.Fields{
 						"code":  te.Code,
@@ -201,8 +207,8 @@ func sendMail(ctx context.Context, dialer Dialer, ms []Mail) {
 					m.Error(err)
 					sender.Reset()
 					continue
-				// If something else happened, let's just error out and reset the
-				// sender
+					// If something else happened, let's just error out and reset the
+					// sender
 				default:
 					log.WithFields(logrus.Fields{
 						"code":  "unknown",

@@ -37,6 +37,10 @@ func (md *mockDialer) defaultDial() (Sender, error) {
 	return newMockSender(), nil
 }
 
+func (md *mockDialer) GetBlockSize() int {
+	return 0
+}
+
 // unreachableDial is to simulate network error conditions in which
 // a host is unavailable.
 func (md *mockDialer) unreachableDial() (Sender, error) {

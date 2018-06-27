@@ -21,11 +21,17 @@ import (
 // between mailer and gomail.
 type Dialer struct {
 	*gomail.Dialer
+	BlockSize int
 }
 
 // Dial wraps the gomail dialer's Dial command
 func (d *Dialer) Dial() (mailer.Sender, error) {
 	return d.Dialer.Dial()
+}
+
+// Get the BlockSize from Database
+func (d *Dialer) GetBlockSize() int {
+	return d.BlockSize
 }
 
 // SMTP contains the attributes needed to handle the sending of campaign emails
@@ -120,7 +126,7 @@ func (s *SMTP) GetDialer() (mailer.Dialer, error) {
 		hostname = "localhost"
 	}
 	d.LocalName = hostname
-	return &Dialer{d}, err
+	return &Dialer{d, s.BlockSize}, err
 }
 
 // GetSMTPs returns the SMTPs owned by the given user.
