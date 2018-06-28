@@ -365,6 +365,7 @@ Sending profiles contain the details for SMTP or other settings used to control 
 + ```username```: foo (string) - The username to authenticate to the SMTP server (optional)
 + ```password```: bar (string) - The password to authenticate to the SMTP server (optional)
 + ```from_address```: Foo Bar <foo.bar@example.com> (string) - The email address to use in the "From" header. This is typically used to spoof email addresses
++ ```block_size```: 0 (integer) - The maximum number of emails to send in one connection - Throttle
 + ```ignore_cert_errors```: false (boolean) - Whether or not to disable certificate validation when connecting to the SMTP server via TLS
 + ```modified_date```: `2015-01-01T01:02:03.000000Z` (string) - Date the Group was last modified
 
