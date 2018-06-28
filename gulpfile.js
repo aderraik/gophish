@@ -9,13 +9,22 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
     cleanCSS = require('gulp-clean-css'),
+	aglio = require('gulp-aglio'),
 
     js_directory = 'static/js/src/',
     css_directory = 'static/css/',
     vendor_directory = js_directory + 'vendor/',
     app_directory = js_directory + 'app/**/*.js',
     dest_js_directory = 'static/js/dist/',
-    dest_css_directory = 'static/css/dist/';
+    dest_css_directory = 'static/css/dist/',
+
+	package_directory = 'package/',
+	db_directory = 'db/',
+	templates_directory = 'templates/',
+	extra_db_directory = 'static/db/',
+	font_directory = 'static/font/',
+	image_directory = 'static/images/',
+	ckeditor_directory = vendor_directory + 'ckeditor/';
 
 gulp.task('vendorjs', function () {
     // Vendor minifying / concat
@@ -84,4 +93,56 @@ gulp.task('styles', function () {
 
 gulp.task('build', ['vendorjs', 'scripts', 'styles']);
 
+gulp.task('package', function() {
+	gulp.src([
+			'gophish'
+			,'config.json'
+			,'LICENSE'
+			,'README.md'
+			,'VERSION'
+		])
+		.pipe(gulp.dest(package_directory));
+	gulp.src([
+			templates_directory + '**'
+		])
+		.pipe(gulp.dest(package_directory + templates_directory));
+	gulp.src([
+			dest_css_directory + '**'
+		])
+		.pipe(gulp.dest(package_directory + dest_css_directory));
+	gulp.src([
+			extra_db_directory + '**'
+		])
+		.pipe(gulp.dest(package_directory + extra_db_directory));
+	gulp.src([
+			font_directory + '**'
+		])
+		.pipe(gulp.dest(package_directory + font_directory));
+	gulp.src([
+			image_directory + '**'
+		])
+		.pipe(gulp.dest(package_directory + image_directory));
+	gulp.src([
+			dest_js_directory + '**'
+		])
+		.pipe(gulp.dest(package_directory + dest_js_directory));
+	gulp.src([
+			ckeditor_directory + '**'
+		])
+		.pipe(gulp.dest(package_directory + ckeditor_directory));
+	return gulp.src([
+			db_directory + '**'
+		])
+		.pipe(gulp.dest(package_directory + db_directory));
+});
+
+gulp.task('docs', function () {
+  gulp.src('templates/gophish.apib')
+    .pipe(aglio({ template: 'default' }))
+    .pipe(gulp.dest('doc/'));
+});
+
+gulp.task('dist', ['package']);
+
 gulp.task('default', ['build']);
+
