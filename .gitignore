@@ -24,6 +24,7 @@ _testmain.go
 
 gophish_admin.crt
 gophish_admin.key
+package/
 
 *.exe
 gophish.db*
@@ -31,4 +32,7 @@ gophish
 
 # JetBrains
 .idea/
+
+# vi temp
+*.swp
 
